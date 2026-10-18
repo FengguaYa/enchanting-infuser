@@ -36,6 +36,19 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Prepare build scripts
+        run: |
+          set -euo pipefail
+          base=https://raw.githubusercontent.com/Fuzss/modresources/main/gradle/v1
+          curl -fsSL "$base/fabric.gradle" -o Fabric/fabric.gradle
+          curl -fsSL "$base/forge.gradle" -o Forge/forge.gradle
+          # the shared version catalog registers CurseGradle under its new plugin id
+          sed -i 's/io\.github\.CDAGaming\.cursegradle/me.hypherionmc.cursegradle/g' Fabric/fabric.gradle Forge/forge.gradle
+          sed -i "s#apply from: '$base/fabric.gradle'#apply from: 'fabric.gradle'#" Fabric/build.gradle
+          sed -i "s#apply from: '$base/forge.gradle'#apply from: 'forge.gradle'#" Forge/build.gradle
+          grep -n "apply from" Fabric/build.gradle Forge/build.gradle
+          grep -n "cursegradle" Fabric/fabric.gradle Forge/forge.gradle
+
       - name: Build Forge and Fabric jars
         run: ./gradlew allBuild --stacktrace --no-daemon
 
