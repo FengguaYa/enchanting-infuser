@@ -38,6 +38,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.EnchantmentTableBlock;
 import net.minecraft.world.level.block.LevelEvent;
@@ -152,7 +153,7 @@ public class InfuserMenu extends AbstractContainerMenu implements ContainerListe
             ItemStack itemstack = container.getItem(0);
             if (!itemstack.isEmpty() && this.mayEnchantStack(itemstack)) {
                 this.levelAccess.execute((Level level, BlockPos pos) -> {
-                    final List<Enchantment> availableEnchantments = EnchantmentUtil.getAvailableEnchantments(itemstack, this.config.types.allowAnvilEnchantments, this.config.types.allowTreasureEnchantments, this.config.types.allowUndiscoverableEnchantments, this.config.types.allowUntradeableEnchantments, this.config.types.allowCursesEnchantments);
+                    final List<Enchantment> availableEnchantments = EnchantmentUtil.getAvailableEnchantments(itemstack, this.config.types.allowAnvilEnchantments, this.config.types.allowTreasureEnchantments, this.config.types.allowUndiscoverableEnchantments, this.config.types.allowUntradeableEnchantments, this.config.types.allowCursesEnchantments, this.config.types.allowMendingEnchantment);
                     this.setAndSyncEnchantments(EnchantmentUtil.copyEnchantmentsToMap(itemstack, availableEnchantments));
                     this.enchantingPower.set(this.getAvailablePower(level, pos));
                     this.repairCost.set(this.calculateRepairCost());
@@ -323,6 +324,8 @@ public class InfuserMenu extends AbstractContainerMenu implements ContainerListe
     }
 
     private Pair<OptionalInt, Integer> getSpecialMaxLevel(Enchantment enchantment, int currentPower, int maxPower) {
+        // mending can be enabled on its own instead of allowing all treasure enchantments, in that case treat it like a regular enchantment for the required enchanting power
+        if (this.config.types.allowMendingEnchantment && enchantment == Enchantments.MENDING) return null;
         double multiplier = -1.0;
         // only allow one multiplier at most as enchantments may have multiple of these properties enabled
         if (EnchantingInfuserAPI.getEnchantStatsProvider().isCurse(enchantment)) {

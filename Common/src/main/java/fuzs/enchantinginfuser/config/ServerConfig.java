@@ -22,6 +22,7 @@ public class ServerConfig implements ConfigCore {
         this.advancedInfuser.allowModifyingEnchantments = ModifiableItems.ALL;
         this.advancedInfuser.costs.maximumCost = 20;
         this.advancedInfuser.types.allowAnvilEnchantments = true;
+        this.advancedInfuser.types.allowMendingEnchantment = true;
     }
 
     public enum ModifiableItems {
@@ -144,5 +145,7 @@ public class ServerConfig implements ConfigCore {
         public boolean allowCursesEnchantments = false;
         @Config(description = "Allow treasure enchantments (e.g. mending) to be applied using the enchanting infuser.")
         public boolean allowTreasureEnchantments = false;
+        @Config(description = "Allow the Mending enchantment to be applied to any item it can normally be applied to, even when treasure enchantments are disabled. This is enabled by default for the advanced enchanting infuser.")
+        public boolean allowMendingEnchantment = false;
     }
 }

@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.util.List;
 import java.util.Map;
@@ -22,11 +23,16 @@ import java.util.stream.Collectors;
 
 public class EnchantmentUtil {
 
-    public static List<Enchantment> getAvailableEnchantments(ItemStack stack, boolean allowAnvil, boolean allowTreasure, boolean allowUndiscoverable, boolean allowUntradeable, boolean allowCurse) {
+    public static List<Enchantment> getAvailableEnchantments(ItemStack stack, boolean allowAnvil, boolean allowTreasure, boolean allowUndiscoverable, boolean allowUntradeable, boolean allowCurse, boolean allowMending) {
         List<Enchantment> list = Lists.newArrayList();
         boolean book = stack.getItem() instanceof BookItem || stack.getItem() instanceof EnchantedBookItem;
         for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT) {
             if ((allowAnvil ? enchantment.canEnchant(stack) : CommonAbstractions.INSTANCE.canApplyAtEnchantingTable(enchantment, stack)) || (book && CommonAbstractions.INSTANCE.isAllowedOnBooks(enchantment))) {
+                // mending is a treasure enchantment, so it can be enabled separately without allowing all other treasure enchantments
+                if (allowMending && enchantment == Enchantments.MENDING) {
+                    list.add(enchantment);
+                    continue;
+                }
                 if (!EnchantingInfuserAPI.getEnchantStatsProvider().isDiscoverable(enchantment)) {
                     if (!allowUndiscoverable) continue;
                 } else if (!EnchantingInfuserAPI.getEnchantStatsProvider().isTradeable(enchantment)) {
